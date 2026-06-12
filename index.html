@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GrowMore — Panel de Control</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Orbitron:wght@600;700&display=swap">
+<style>
+:root{
+  --color-background-primary:#000000;
+  --color-background-secondary:#1A1A1A;
+  --color-text-primary:#F0EFEB;
+  --color-text-secondary:#9A978E;
+  --color-border-tertiary:#2A2A2A;
+  --color-border-secondary:#3A3A3A;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-sans);background:var(--color-background-primary);color:var(--color-text-primary);padding:20px;max-width:1100px;margin:0 auto}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:0.5px solid var(--color-border-tertiary);overflow-x:auto}
+.tab{padding:8px 12px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab.active{color:var(--color-text-primary);border-bottom:2px solid #1D9E75;font-weight:500}
+.tab:hover{color:var(--color-text-primary)}
+.view{display:none}.view.active{display:block}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+.metric{background:var(--color-background-secondary);border-radius:8px;padding:12px 14px}
+.metric .lbl{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.metric .val{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.card-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500}
+.stage-bar{height:6px;border-radius:3px;background:var(--color-border-tertiary);margin:6px 0;overflow:hidden}
+.stage-fill{height:100%;border-radius:3px}
+.info-row{display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-secondary);margin-top:4px}
+.varieties{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.var-tag{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.alert-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.alert-item:last-child{border-bottom:none}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.alert-text{font-size:13px;color:var(--color-text-primary);flex:1}
+.alert-date{font-size:12px;color:var(--color-text-secondary)}
+.gantt-wrap{overflow-x:auto;position:relative}
+.gantt-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;min-width:780px}
+.gantt-label{font-size:12px;color:var(--color-text-secondary);width:80px;flex-shrink:0;text-align:right}
+.gantt-track{flex:1;height:22px;position:relative;background:var(--color-background-secondary);border-radius:3px}
+.gantt-seg{position:absolute;height:100%;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.95);font-weight:500;overflow:hidden;white-space:nowrap;padding:0 4px}
+.gantt-today{position:absolute;top:0;bottom:0;width:1.5px;background:#E24B4A;z-index:11}
+.gantt-monthline{position:absolute;top:0;bottom:0;width:1px;background:var(--color-border-secondary);opacity:.5;z-index:1}
+.section-title{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 8px}
+.ragnar-title{font-size:15px;font-weight:600;color:#1DE0A0;text-transform:none;letter-spacing:normal;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.ragnar-title i{font-size:16px}
+.variety-name{font-weight:500}
+.sala-selector{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.sala-btn{padding:5px 12px;font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:20px;background:none;cursor:pointer;color:var(--color-text-secondary)}
+.sala-btn.active{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
+.timeline-wrap{position:relative;padding:8px 0 8px 16px;margin:12px 0}
+.tl-line{position:absolute;left:22px;top:0;bottom:0;width:1.5px;background:var(--color-border-tertiary)}
+.tl-item{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px;position:relative}
+.tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:3px;position:relative;z-index:1;border:2px solid var(--color-background-primary)}
+.tl-content{flex:1}
+.tl-stage{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.tl-date{font-size:12px;color:var(--color-text-secondary)}
+.tl-days{font-size:11px;padding:2px 7px;border-radius:10px;display:inline-block;margin-top:3px}
+.ph-table{width:100%;font-size:12px;border-collapse:collapse}
+.ph-table th{text-align:left;padding:6px 8px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);font-size:11px}
+.ph-table td{padding:6px 8px;color:var(--color-text-primary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.ph-table tr:last-child td{border-bottom:none}
+.obs-box{background:var(--color-background-secondary);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--color-text-secondary);line-height:1.5;font-style:italic}
+.event-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.event-item:last-child{border-bottom:none}
+.event-date{font-size:12px;color:var(--color-text-secondary);width:90px;flex-shrink:0}
+.event-content{flex:1}
+.event-sala{font-size:13px;font-weight:500;color:#1D9E75}
+.event-vars{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.legend-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary)}
+.legend-swatch{width:10px;height:10px;border-radius:2px;display:inline-block}
+.month-selector{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.month-btn{padding:5px 12px;font-size:12px;border:0.5px solid var(--color-border-secondary);border-radius:20px;background:none;cursor:pointer;color:var(--color-text-secondary)}
+.month-btn.active{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:500}
+.clock-card{background:var(--color-background-secondary);border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.clock-date{font-size:20px;font-weight:500;color:var(--color-text-primary);text-transform:uppercase;letter-spacing:.04em}
+.clock-time{font-size:36px;font-weight:600;color:#1D9E75;font-variant-numeric:tabular-nums;font-family:'Space Grotesk',var(--font-sans);letter-spacing:.02em}
+.task-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.task-item:last-child{border-bottom:none}
+.task-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--color-border-secondary);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.task-check.done{background:#1D9E75;border-color:#1D9E75}
+.task-text{font-size:13px;flex:1;color:var(--color-text-primary)}
+.task-text.done{text-decoration:line-through;color:var(--color-text-secondary)}
+.task-del{cursor:pointer;color:var(--color-text-secondary);font-size:14px;flex-shrink:0}
+.task-input-row{display:flex;gap:6px;margin-top:8px}
+.task-input{flex:1;font-size:13px;padding:6px 10px;border:0.5px solid var(--color-border-secondary);border-radius:8px;background:var(--color-background-primary);color:var(--color-text-primary)}
+.task-add-btn{font-size:12px;padding:6px 12px;border:0.5px solid var(--color-border-secondary);border-radius:8px;background:none;cursor:pointer;color:var(--color-text-secondary)}
+@media (max-width:640px){
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important}
+}
+</style>
+</head>
+<body>
+
+<h2 class="sr-only">GrowMore — panel de control de cultivos: estado, alertas, Gantt, detalle por sala, Ragnar, pesos y proyección de disponibilidad por variedad.</h2>
+
+<div style="padding:1rem 0 0">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+  <div>
+    <div style="font-size:30px;font-weight:700;color:var(--color-text-primary);font-family:'Orbitron',var(--font-sans);letter-spacing:.02em"><i class="ti ti-plant" aria-hidden="true" style="font-size:30px;margin-right:8px;color:#1D9E75;vertical-align:-4px"></i>GrowMore</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <button onclick="loadFromDropbox(true)" style="font-size:12px;padding:6px 12px;border:0.5px solid var(--color-border-secondary);border-radius:8px;color:var(--color-text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:none"><i class="ti ti-refresh" aria-hidden="true" style="font-size:14px"></i>Actualizar desde Dropbox</button>
+    <label style="cursor:pointer">
+      <input type="file" id="xlsxInput" accept=".xlsx" style="display:none">
+      <span style="font-size:12px;padding:6px 12px;border:0.5px solid var(--color-border-secondary);border-radius:8px;color:var(--color-text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:6px"><i class="ti ti-upload" aria-hidden="true" style="font-size:14px"></i>Subir Excel</span>
+    </label>
+  </div>
+</div>
+<div id="dropbox-status" style="font-size:11px;color:var(--color-text-secondary);margin-bottom:16px;text-align:right"></div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('estado',this)"><i class="ti ti-layout-grid" aria-hidden="true" style="font-size:13px;margin-right:4px"></i>Estado</button>
+  <button class="tab" onclick="showTab('alertas',this)"><i class="ti ti-bell" aria-hidden="true" style="font-size:13px;margin-right:4px"></i>Próximas fechas</button>
+  <button class="tab" onclick="showTab('gantt',this)"><i class="ti ti-timeline" aria-hidden="true" style="font-size:13px;margin-right:4px"></i>Gantt</button>
+  <button class="tab" onclick="showTab('detalle',this)"><i class="ti ti-plant-2" aria-hidden="true" style="font-size:13px;margin-right:4px"></i>Detalle sala</button>
+  <button class="tab" onclick="showTab('ragnar',this)"><i class="ti ti-seeding" aria-hidden="true" style="font-size:13px;margin-right:4px"></i>Ragnar</button>
+  <button class="tab" onclick="showTab('proyeccion',this)"><i class="ti ti-calendar-stats" aria-hidden="true" style="font-size:13px;margin-right:4px"></i>Proyección</button>
+  <button class="tab" onclick="showTab('pesos',this)"><i class="ti ti-scale" aria-hidden="true" style="font-size:13px;margin-right:4px"></i>Pesos</button>
+</div>
+
+<div id="view-estado" class="view active"></div>
+<div id="view-alertas" class="view"></div>
+<div id="view-gantt" class="view"></div>
+<div id="view-detalle" class="view"></div>
+<div id="view-ragnar" class="view"></div>
+<div id="view-proyeccion" class="view"></div>
+<div id="view-pesos" class="view"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const TODAY=new Date();
+
+const STAGE_COLORS={
+  "Esquejes":"#7F77DD",
+  "Trasplante a Vaso":"#D4537E",
+  "Trasplante Maceta":"#F0997B",
+  "Ingreso a Sala":"#1D9E75",
+  "Ingreso a Carpa":"#0F6E56",
+  "Vegetación":"#5DCAA5",
+  "Floración":"#FAC775",
+  "Corte":"#E24B4A",
+  "Secado":"#85B7EB",
+  "Procesado":"#378ADD",
+  "Disponible":"#97C459"
+};
+
+const VARIETY_COLORS=["#7F77DD","#1D9E75","#D4537E","#FAC775","#378ADD","#E24B4A","#97C459","#F0997B","#85B7EB","#534AB7","#993C1D","#993556"];
+
+let VARIETY_COLOR_MAP=null;
+function buildVarietyColorMap(){
+  const names=new Set();
+  DATA.forEach(sp=>sp.cycles.forEach(c=>{(c.varieties||[]).forEach(v=>{if(v.name)names.add(v.name);});}));
+  RAGNAR.esquejes.forEach(e=>{if(e.variedad)names.add(e.variedad);});
+  RAGNAR.macetas.forEach(e=>{if(e.variedad)names.add(e.variedad);});
+  RAGNAR.madres.forEach(e=>{if(e.variedad)names.add(e.variedad);});
+  PROY.forEach(e=>{
+    e.variedades.split(',').forEach(p=>{
+      const m=p.trim().match(/^(.*)\s\((\d+)\)$/);
+      if(m)names.add(m[1].trim());
+    });
+  });
+  const sorted=[...names].sort();
+  const map={};
+  sorted.forEach((n,i)=>{map[n]=VARIETY_COLORS[i%VARIETY_COLORS.length];});
+  VARIETY_COLOR_MAP=map;
+}
+function varietyColor(name){
+  if(!VARIETY_COLOR_MAP)buildVarietyColorMap();
+  return VARIETY_COLOR_MAP[name]||'#9A978E';
+}
+
+let RAGNAR={"esquejes": [{"variedad": "Frosen Biscotti #2", "cantidad": 36}, {"variedad": "Blue Zushi", "cantidad": 7}, {"variedad": "HTT #4", "cantidad": 41}, {"variedad": "Papaya #5", "cantidad": 24}, {"variedad": "Guava", "cantidad": 18}, {"variedad": "Pink Lemon #2", "cantidad": 12}], "macetas": [{"variedad": "MR", "fecha": null, "cantidad": 36, "sala_destino": null}, {"variedad": "Guava", "fecha": null, "cantidad": 36, "sala_destino": null}], "madres": [{"variedad": "Guava", "fecha_clones": null, "cantidad": 1, "obs": null}, {"variedad": "MR", "fecha_clones": null, "cantidad": 2, "obs": null}, {"variedad": "CC", "fecha_clones": null, "cantidad": 2, "obs": null}, {"variedad": "Pink Lemon", "fecha_clones": null, "cantidad": 1, "obs": null}, {"variedad": "HTT", "fecha_clones": null, "cantidad": 2, "obs": null}, {"variedad": "Papaya 5", "fecha_clones": null, "cantidad": 3, "obs": null}], "historial": []};
+
+let DATA=[{"name": "SALA 1", "cycles": [{"name": "CICLO 1", "stages": [{"stage": "Esquejes", "days": 21, "date": "2026-04-10"}, {"stage": "Trasplante a Vaso", "days": 14, "date": "2026-05-01"}, {"stage": "Trasplante Maceta", "days": 14, "date": "2026-05-15"}, {"stage": "Ingreso a Sala", "days": 16, "date": "2026-05-29"}, {"stage": "Floración", "days": 63, "date": "2026-06-14"}, {"stage": "Corte", "days": 2, "date": "2026-08-16"}, {"stage": "Secado", "days": 7, "date": "2026-08-18"}, {"stage": "Procesado", "days": 3, "date": "2026-08-25"}, {"stage": "Disponible", "days": null, "date": "2026-08-28"}], "varieties": [{"name": "Coco", "qty": 28}, {"name": "MR", "qty": 44}], "obs": ""}, {"name": "CICLO 2", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-08-26"}, {"stage": "Floración", "days": 63, "date": "2026-09-11"}, {"stage": "Corte", "days": 2, "date": "2026-11-13"}, {"stage": "Secado", "days": 7, "date": "2026-11-15"}, {"stage": "Procesado", "days": 3, "date": "2026-11-22"}, {"stage": "Disponible", "days": null, "date": "2026-11-25"}], "varieties": [], "obs": ""}, {"name": "CICLO 3", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-11-23"}, {"stage": "Floración", "days": 63, "date": "2026-12-09"}, {"stage": "Corte", "days": 1, "date": "2027-02-10"}, {"stage": "Secado", "days": 7, "date": "2027-02-11"}, {"stage": "Procesado", "days": 3, "date": "2027-02-18"}, {"stage": "Disponible", "days": null, "date": "2027-02-21"}], "varieties": [], "obs": ""}]}, {"name": "SALA 2", "cycles": [{"name": "CICLO 1", "stages": [{"stage": "Esquejes", "days": 21, "date": "2026-02-28"}, {"stage": "Trasplante a Vaso", "days": 14, "date": "2026-03-21"}, {"stage": "Trasplante Maceta", "days": 14, "date": "2026-04-04"}, {"stage": "Ingreso a Sala", "days": 16, "date": "2026-04-18"}, {"stage": "Floración", "days": 63, "date": "2026-05-04"}, {"stage": "Corte", "days": 2, "date": "2026-07-06"}, {"stage": "Secado", "days": 7, "date": "2026-07-08"}, {"stage": "Procesado", "days": 3, "date": "2026-07-15"}, {"stage": "Disponible", "days": null, "date": "2026-07-18"}], "varieties": [{"name": "Guava", "qty": 30}, {"name": "Mix", "qty": 10}], "obs": ""}, {"name": "CICLO 2", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-07-16"}, {"stage": "Floración", "days": 63, "date": "2026-08-01"}, {"stage": "Corte", "days": 1, "date": "2026-10-03"}, {"stage": "Secado", "days": 7, "date": "2026-10-04"}, {"stage": "Procesado", "days": 3, "date": "2026-10-11"}, {"stage": "Disponible", "days": null, "date": "2026-10-14"}], "varieties": [], "obs": ""}, {"name": "CICLO 3", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-10-12"}, {"stage": "Floración", "days": 63, "date": "2026-10-28"}, {"stage": "Corte", "days": 1, "date": "2026-12-30"}, {"stage": "Secado", "days": 7, "date": "2026-12-31"}, {"stage": "Procesado", "days": 3, "date": "2027-01-07"}, {"stage": "Disponible", "days": null, "date": "2027-01-10"}], "varieties": [], "obs": ""}]}, {"name": "SALA 3", "cycles": [{"name": "CICLO 1", "stages": [{"stage": "Esquejes", "days": 21, "date": "2026-03-14"}, {"stage": "Trasplante a Vaso", "days": 14, "date": "2026-04-04"}, {"stage": "Trasplante Maceta", "days": 14, "date": "2026-04-18"}, {"stage": "Ingreso a Sala", "days": 16, "date": "2026-05-02"}, {"stage": "Floración", "days": 63, "date": "2026-05-18"}, {"stage": "Corte", "days": 1, "date": "2026-07-20"}, {"stage": "Secado", "days": 7, "date": "2026-07-21"}, {"stage": "Procesado", "days": 3, "date": "2026-07-28"}, {"stage": "Disponible", "days": null, "date": "2026-07-31"}], "varieties": [{"name": "Lemon Cherry", "qty": 18}, {"name": "FB", "qty": 26}, {"name": "HTT", "qty": 19}, {"name": "Blue Sushi", "qty": 9}], "obs": ""}, {"name": "CICLO 2", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-07-29"}, {"stage": "Floración", "days": 63, "date": "2026-08-14"}, {"stage": "Corte", "days": 3, "date": "2026-10-16"}, {"stage": "Secado", "days": 7, "date": "2026-10-19"}, {"stage": "Procesado", "days": 3, "date": "2026-10-26"}, {"stage": "Disponible", "days": null, "date": "2026-10-29"}], "varieties": [], "obs": ""}, {"name": "CICLO 3", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-10-27"}, {"stage": "Floración", "days": 63, "date": "2026-11-12"}, {"stage": "Corte", "days": 1, "date": "2027-01-14"}, {"stage": "Secado", "days": 7, "date": "2027-01-15"}, {"stage": "Procesado", "days": 3, "date": "2027-01-22"}, {"stage": "Disponible", "days": null, "date": "2027-01-25"}], "varieties": [], "obs": ""}]}, {"name": "SALA 4", "cycles": [{"name": "CICLO 1", "stages": [{"stage": "Esquejes", "days": 21, "date": "2026-03-20"}, {"stage": "Trasplante a Vaso", "days": 14, "date": "2026-04-10"}, {"stage": "Trasplante Maceta", "days": 14, "date": "2026-04-24"}, {"stage": "Ingreso a Sala", "days": 16, "date": "2026-05-08"}, {"stage": "Floración", "days": 63, "date": "2026-05-24"}, {"stage": "Corte", "days": 1, "date": "2026-07-26"}, {"stage": "Secado", "days": 7, "date": "2026-07-27"}, {"stage": "Procesado", "days": 3, "date": "2026-08-03"}, {"stage": "Disponible", "days": null, "date": "2026-08-06"}], "varieties": [{"name": "Brberry", "qty": 16}, {"name": "Cherry Soda", "qty": 12}, {"name": "Sprits", "qty": 22}], "obs": ""}, {"name": "CICLO 2", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-08-04"}, {"stage": "Floración", "days": 63, "date": "2026-08-20"}, {"stage": "Corte", "days": 3, "date": "2026-10-22"}, {"stage": "Secado", "days": 7, "date": "2026-10-25"}, {"stage": "Procesado", "days": 3, "date": "2026-11-01"}, {"stage": "Disponible", "days": null, "date": "2026-11-04"}], "varieties": [], "obs": ""}, {"name": "CICLO 3", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-11-02"}, {"stage": "Floración", "days": 63, "date": "2026-11-18"}, {"stage": "Corte", "days": 1, "date": "2027-01-20"}, {"stage": "Secado", "days": 7, "date": "2027-01-21"}, {"stage": "Procesado", "days": 3, "date": "2027-01-28"}, {"stage": "Disponible", "days": null, "date": "2027-01-31"}], "varieties": [], "obs": ""}]}, {"name": "SALA 5", "cycles": [{"name": "CICLO 1", "stages": [{"stage": "Esquejes", "days": 21, "date": "2026-04-01"}, {"stage": "Trasplante a Vaso", "days": 14, "date": "2026-04-22"}, {"stage": "Trasplante Maceta", "days": 14, "date": "2026-05-06"}, {"stage": "Ingreso a Sala", "days": 16, "date": "2026-05-20"}, {"stage": "Floración", "days": 63, "date": "2026-06-05"}, {"stage": "Corte", "days": 1, "date": "2026-08-07"}, {"stage": "Secado", "days": 7, "date": "2026-08-08"}, {"stage": "Procesado", "days": 3, "date": "2026-08-15"}, {"stage": "Disponible", "days": null, "date": "2026-08-18"}], "varieties": [{"name": "Papaya", "qty": 33}], "obs": ""}, {"name": "CICLO 2", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-08-16"}, {"stage": "Floración", "days": 63, "date": "2026-09-01"}, {"stage": "Corte", "days": 1, "date": "2026-11-03"}, {"stage": "Secado", "days": 7, "date": "2026-11-04"}, {"stage": "Procesado", "days": 3, "date": "2026-11-11"}, {"stage": "Disponible", "days": null, "date": "2026-11-14"}], "varieties": [], "obs": ""}, {"name": "CICLO 3", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-11-12"}, {"stage": "Floración", "days": 63, "date": "2026-11-28"}, {"stage": "Corte", "days": 1, "date": "2027-01-30"}, {"stage": "Secado", "days": 7, "date": "2027-01-31"}, {"stage": "Procesado", "days": 3, "date": "2027-02-07"}, {"stage": "Disponible", "days": null, "date": "2027-02-10"}], "varieties": [], "obs": ""}]}, {"name": "SALA 6", "cycles": [{"name": "CICLO 1", "stages": [{"stage": "Esquejes", "days": 21, "date": "2026-02-05"}, {"stage": "Trasplante a Vaso", "days": 14, "date": "2026-02-26"}, {"stage": "Trasplante Maceta", "days": 14, "date": "2026-03-12"}, {"stage": "Ingreso a Sala", "days": 16, "date": "2026-03-26"}, {"stage": "Floración", "days": 63, "date": "2026-04-11"}, {"stage": "Corte", "days": 1, "date": "2026-06-13"}, {"stage": "Secado", "days": 7, "date": "2026-06-14"}, {"stage": "Procesado", "days": 3, "date": "2026-06-21"}, {"stage": "Disponible", "days": null, "date": "2026-06-24"}], "varieties": [{"name": "Papaya", "qty": 22}, {"name": "Cherry", "qty": 19}, {"name": "brrry", "qty": 3}, {"name": "Sour nana", "qty": 1}, {"name": "Spritz", "qty": 3}], "obs": ""}, {"name": "CICLO 2", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-06-22"}, {"stage": "Floración", "days": 63, "date": "2026-07-08"}, {"stage": "Corte", "days": 1, "date": "2026-09-09"}, {"stage": "Secado", "days": 7, "date": "2026-09-10"}, {"stage": "Procesado", "days": 3, "date": "2026-09-17"}, {"stage": "Disponible", "days": null, "date": "2026-09-20"}], "varieties": [], "obs": ""}, {"name": "CICLO 3", "stages": [{"stage": "Ingreso a Sala", "days": 16, "date": "2026-09-18"}, {"stage": "Floración", "days": 63, "date": "2026-10-04"}, {"stage": "Corte", "days": 1, "date": "2026-12-06"}, {"stage": "Secado", "days": 7, "date": "2026-12-07"}, {"stage": "Procesado", "days": 3, "date": "2026-12-14"}, {"stage": "Disponible", "days": null, "date": "2026-12-17"}], "varieties": [], "obs": ""}]}, {"name": "CARPA 1", "cycles": [{"name": "CICLO 1", "stages": [{"stage": "Ingreso a Carpa", "days": 20, "date": "2026-06-05"}, {"stage": "Floración", "days": 63, "date": "2026-06-25"}, {"stage": "Corte", "days": 1, "date": "2026-08-27"}, {"stage": "Secado", "days": 7, "date": "2026-08-28"}, {"stage": "Procesado", "days": 3, "date": "2026-09-04"}, {"stage": "Disponible", "days": null, "date": "2026-09-07"}], "varieties": [{"name": "Cherry Soda", "qty": 3}, {"name": "Hot tub time", "qty": 2}, {"name": "Papaya", "qty": 5}], "obs": ""}, {"name": "CICLO 2", "stages": [{"stage": "Ingreso a Carpa", "days": 20, "date": "2026-09-05"}, {"stage": "Floración", "days": 63, "date": "2026-09-25"}, {"stage": "Corte", "days": 1, "date": "2026-11-27"}, {"stage": "Secado", "days": 7, "date": "2026-11-28"}, {"stage": "Procesado", "days": 3, "date": "2026-12-05"}, {"stage": "Disponible", "days": null, "date": "2026-12-08"}], "varieties": [], "obs": ""}]}, {"name": "CARPA 2", "cycles": [{"name": "CICLO 1", "stages": [{"stage": "Ingreso a Carpa", "days": 20, "date": "2026-05-17"}, {"stage": "Floración", "days": 63, "date": "2026-06-06"}, {"stage": "Corte", "days": 1, "date": "2026-08-08"}, {"stage": "Secado", "days": 7, "date": "2026-08-09"}, {"stage": "Procesado", "days": 3, "date": "2026-08-16"}, {"stage": "Disponible", "days": null, "date": "2026-08-19"}], "varieties": [{"name": "HTT (Feno Hunt)", "qty": 25}], "obs": ""}, {"name": "CICLO 2", "stages": [{"stage": "Ingreso a Carpa", "days": 20, "date": "2026-08-17"}, {"stage": "Floración", "days": 63, "date": "2026-09-06"}, {"stage": "Corte", "days": 1, "date": "2026-11-08"}, {"stage": "Secado", "days": 7, "date": "2026-11-09"}, {"stage": "Procesado", "days": 3, "date": "2026-11-16"}, {"stage": "Disponible", "days": null, "date": "2026-11-19"}], "varieties": [], "obs": ""}]}, {"name": "CARPA 3", "cycles": [{"name": "CICLO 1", "stages": [{"stage": "Ingreso a Carpa", "days": 20, "date": "2026-04-08"}, {"stage": "Floración", "days": 63, "date": "2026-04-28"}, {"stage": "Corte", "days": 1, "date": "2026-06-30"}, {"stage": "Secado", "days": 7, "date": "2026-07-01"}, {"stage": "Procesado", "days": 3, "date": "2026-07-08"}, {"stage": "Disponible", "days": null, "date": "2026-07-11"}], "varieties": [{"name": "Guava", "qty": 37}], "obs": ""}, {"name": "CICLO 2", "stages": [{"stage": "Ingreso a Carpa", "days": 20, "date": "2026-07-09"}, {"stage": "Floración", "days": 63, "date": "2026-07-29"}, {"stage": "Corte", "days": 1, "date": "2026-09-30"}, {"stage": "Secado", "days": 7, "date": "2026-10-01"}, {"stage": "Procesado", "days": 3, "date": "2026-10-08"}, {"stage": "Disponible", "days": null, "date": "2026-10-11"}], "varieties": [], "obs": ""}]}, {"name": "CARPA 4", "cycles": [{"name": "CICLO 1", "stages": [{"stage": "Ingreso a Carpa", "days": 20, "date": "2026-06-09"}, {"stage": "Floración", "days": 63, "date": "2026-06-29"}, {"stage": "Corte", "days": 1, "date": "2026-08-31"}, {"stage": "Secado", "days": 7, "date": "2026-09-01"}, {"stage": "Procesado", "days": 3, "date": "2026-09-08"}, {"stage": "Disponible", "days": null, "date": "2026-09-11"}], "varieties": [{"name": "Coco", "qty": 14}], "obs": ""}, {"name": "CICLO 2", "stages": [{"stage": "Ingreso a Carpa", "days": 20, "date": "2026-09-09"}, {"stage": "Floración", "days": 63, "date": "2026-09-29"}, {"stage": "Corte", "days": 1, "date": "2026-12-01"}, {"stage": "Secado", "days": 7, "date": "2026-12-02"}, {"stage": "Procesado", "days": 3, "date": "2026-12-09"}, {"stage": "Disponible", "days": null, "date": "2026-12-12"}], "varieties": [], "obs": ""}]}];
+
+const PESOS=[{"sala": "SALA 1", "ciclo": "CICLO 1", "fecha": "2026-08-16", "variedad": "Coco", "pct": 0.3888888888888889, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 1", "ciclo": null, "fecha": "2026-08-16", "variedad": "MR", "pct": 0.6111111111111112, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 1", "ciclo": "CICLO 3", "fecha": "2027-02-10", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 2", "ciclo": "CICLO 1", "fecha": "2026-07-06", "variedad": "Guava", "pct": 0.75, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 2", "ciclo": null, "fecha": "2026-07-06", "variedad": "Mix", "pct": 0.25, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 2", "ciclo": "CICLO 2", "fecha": "2026-10-03", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 2", "ciclo": "CICLO 3", "fecha": "2026-12-30", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 3", "ciclo": "CICLO 1", "fecha": "2026-07-20", "variedad": "Lemon Cherry", "pct": 0.25, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 3", "ciclo": null, "fecha": "2026-07-20", "variedad": "FB", "pct": 0.3611111111111111, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 3", "ciclo": null, "fecha": "2026-07-20", "variedad": "HTT", "pct": 0.2638888888888889, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 3", "ciclo": null, "fecha": "2026-07-20", "variedad": "Blue Sushi", "pct": 0.125, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 3", "ciclo": "CICLO 2", "fecha": "2026-10-16", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 3", "ciclo": "CICLO 3", "fecha": "2027-01-14", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 4", "ciclo": "CICLO 1", "fecha": "2026-07-26", "variedad": "Brberry", "pct": 0.32, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 4", "ciclo": null, "fecha": "2026-07-26", "variedad": "Cherry Soda", "pct": 0.24, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 4", "ciclo": null, "fecha": "2026-07-26", "variedad": "Sprits", "pct": 0.44, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 4", "ciclo": "CICLO 2", "fecha": "2026-10-22", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 4", "ciclo": "CICLO 3", "fecha": "2027-01-20", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 5", "ciclo": "CICLO 1", "fecha": "2026-08-07", "variedad": "Papaya", "pct": 1, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 5", "ciclo": "CICLO 2", "fecha": "2026-11-03", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 5", "ciclo": "CICLO 3", "fecha": "2027-01-30", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 6", "ciclo": "CICLO 1", "fecha": "2026-06-13", "variedad": "Papaya", "pct": 0.4583333333333333, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 6", "ciclo": null, "fecha": "2026-06-13", "variedad": "Cherry", "pct": 0.3958333333333333, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 6", "ciclo": null, "fecha": "2026-06-13", "variedad": "brrry", "pct": 0.0625, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 6", "ciclo": null, "fecha": "2026-06-13", "variedad": "Sour nana", "pct": 0.020833333333333332, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 6", "ciclo": null, "fecha": "2026-06-13", "variedad": "Spritz", "pct": 0.0625, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 6", "ciclo": "CICLO 2", "fecha": "2026-09-09", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "SALA 6", "ciclo": "CICLO 3", "fecha": "2026-12-06", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "CARPA 1", "ciclo": "CICLO 1", "fecha": "2026-08-27", "variedad": "Cherry Soda", "pct": 0.3, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "CARPA 1", "ciclo": null, "fecha": "2026-08-27", "variedad": "Hot tub time", "pct": 0.2, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "CARPA 1", "ciclo": null, "fecha": "2026-08-27", "variedad": "Papaya", "pct": 0, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "CARPA 1", "ciclo": "CICLO 2", "fecha": "2026-11-27", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "CARPA 2", "ciclo": "CICLO 1", "fecha": "2026-08-08", "variedad": "HTT (Feno Hunt)", "pct": 1, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "CARPA 2", "ciclo": "CICLO 2", "fecha": "2026-11-08", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "CARPA 3", "ciclo": "CICLO 1", "fecha": "2026-06-30", "variedad": "Guava", "pct": 1, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "CARPA 3", "ciclo": "CICLO 2", "fecha": "2026-09-30", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "CARPA 4", "ciclo": "CICLO 1", "fecha": "2026-08-31", "variedad": "Coco", "pct": 1, "peso_g": null, "peso_kg": null, "notas": null}, {"sala": "CARPA 4", "ciclo": "CICLO 2", "fecha": "2026-12-01", "variedad": "(sin variedad)", "pct": null, "peso_g": null, "peso_kg": null, "notas": null}];
+
+let PROY=[{"sala": "SALA 6", "fecha": "2026-06-24", "mes": "Junio 2026", "variedades": "Papaya (22), Cherry (19), brrry (3), Sour nana (1), Spritz (3)"}, {"sala": "CARPA 3", "fecha": "2026-07-11", "mes": "Julio 2026", "variedades": "Guava (37)"}, {"sala": "SALA 2", "fecha": "2026-07-18", "mes": "Julio 2026", "variedades": "Guava (30), Mix (10)"}, {"sala": "SALA 3", "fecha": "2026-07-31", "mes": "Julio 2026", "variedades": "Lemon Cherry (18), FB (26), HTT (19), Blue Sushi (9)"}, {"sala": "SALA 4", "fecha": "2026-08-06", "mes": "Agosto 2026", "variedades": "Brberry (16), Cherry Soda (12), Sprits (22)"}, {"sala": "SALA 5", "fecha": "2026-08-18", "mes": "Agosto 2026", "variedades": "Papaya (33)"}, {"sala": "CARPA 2", "fecha": "2026-08-19", "mes": "Agosto 2026", "variedades": "HTT (Feno Hunt) (25)"}, {"sala": "SALA 1", "fecha": "2026-08-28", "mes": "Agosto 2026", "variedades": "Coco (28), MR (44)"}, {"sala": "CARPA 1", "fecha": "2026-09-07", "mes": "Septiembre 2026", "variedades": "Cherry Soda (3), Hot tub time (2), Papaya (5)"}, {"sala": "CARPA 4", "fecha": "2026-09-11", "mes": "Septiembre 2026", "variedades": "Coco (14)"}];
+
+let selectedSala=DATA[0].name;
+let selectedMonth=null;
+let selectedPesoSala=null;
+let tasks=[
+  {id:1,text:'Revisar pH y EC en todas las salas',done:false},
+  {id:2,text:'Registrar riego de la mañana',done:false}
+];
+
+function pd(s){if(!s)return null;const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+function dd(a,b){return Math.round((b-a)/86400000);}
+function fmt(d){if(!d)return'—';return d.toLocaleDateString('es-CL',{day:'2-digit',month:'short'});}
+function fmtFull(d){if(!d)return'—';return d.toLocaleDateString('es-CL',{day:'2-digit',month:'short',year:'numeric'});}
+
+function getDisplayStages(cycle){
+  const out=[];
+  for(let i=0;i<cycle.stages.length;i++){
+    const s=cycle.stages[i];
+    if(s.stage==='Ingreso a Sala'||s.stage==='Ingreso a Carpa'){
+      const sd=pd(s.date);
+      const totalDays=s.days||0;
+      const vegDays=Math.max(0,totalDays-1);
+      out.push({stage:s.stage,days:1,date:s.date});
+      if(vegDays>0){
+        const vegStart=new Date(sd);vegStart.setDate(vegStart.getDate()+1);
+        const y=vegStart.getFullYear(),m=String(vegStart.getMonth()+1).padStart(2,'0'),d=String(vegStart.getDate()).padStart(2,'0');
+        out.push({stage:'Vegetación',days:vegDays,date:`${y}-${m}-${d}`});
+      }
+    } else {
+      out.push(s);
+    }
+  }
+  return out;
+}
+
+function getActive(sp){
+  let ac=null;
+  for(const c of sp.cycles){
+    if(!c.stages||!c.stages.length)continue;
+    const f=pd(c.stages[0].date),l=pd(c.stages[c.stages.length-1].date);
+    if(!f||!l)continue;
+    if(f<=TODAY&&TODAY<=l){ac=c;break;}
+    if(f>TODAY&&!ac)ac=c;
+  }
+  if(!ac){
+    for(const c of sp.cycles){if(c.stages&&c.stages.length){ac=c;}}
+  }
+  return ac;
+}
+
+function getCurStage(cycle){
+  if(!cycle||!cycle.stages||!cycle.stages.length)return null;
+  const ds=getDisplayStages(cycle);
+  for(let i=0;i<ds.length-1;i++){
+    const sd=pd(ds[i].date),nd=pd(ds[i+1].date);
+    if(sd&&nd&&sd<=TODAY&&TODAY<nd)return{stage:ds[i],idx:i,next:ds[i+1]};
+  }
+  const last=ds[ds.length-1];
+  const ld=pd(last.date);
+  if(ld&&TODAY>=ld)return{stage:last,idx:ds.length-1,next:null};
+  return{stage:ds[0],idx:0,next:ds[1]};
+}
+
+function badgeStyle(s){const c=STAGE_COLORS[s]||'#888';return`background:${c}22;color:${c};border:0.5px solid ${c}66`;}
+
+function renderEstado(){
+  const salas=DATA.filter(d=>d.name.startsWith('SALA'));
+  const carpas=DATA.filter(d=>d.name.startsWith('CARPA'));
+  let tp=0,fl=0,vg=0;
+  DATA.forEach(sp=>{const ac=getActive(sp);if(ac){ac.varieties.forEach(v=>{tp+=parseInt(v.qty)||0;});const cs=getCurStage(ac);if(cs){if(cs.stage.stage==='Floración')fl++;if(cs.stage.stage==='Vegetación')vg++;}}});
+
+  let h=`<div class="clock-card">
+    <div class="clock-date" id="clock-date"></div>
+    <div class="clock-time" id="clock-time"></div>
+  </div>`;
+
+  h+=`<div class="grid4">
+    <div class="metric"><div class="lbl">Espacios activos</div><div class="val">${DATA.length}</div></div>
+    <div class="metric"><div class="lbl">En vegetación</div><div class="val" style="color:#1D9E75">${vg}</div></div>
+    <div class="metric"><div class="lbl">En floración</div><div class="val" style="color:#E24B4A">${fl}</div></div>
+  </div>`;
+
+  h+=`<div class="section-title">Tareas del día</div>
+  <div class="card" id="tasks-card"></div>`;
+
+  h+=`<div class="section-title">Salas</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:10px">`;
+  salas.forEach(sp=>{h+=renderSmallCard(sp);});
+  h+=`</div><div class="section-title" style="margin-top:12px">Carpas</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:10px">`;
+  carpas.forEach(sp=>{h+=renderSmallCard(sp);});
+  h+=`</div>`;
+  return h;
+}
+
+function renderSmallCard(sp){
+  const ac=getActive(sp);
+  if(!ac||!ac.stages||!ac.stages.length)return`<div class="card"><div class="card-header"><span class="card-title">${sp.name}</span><span class="badge" style="background:var(--color-background-secondary);color:var(--color-text-secondary)">Sin datos</span></div></div>`;
+  const cs=getCurStage(ac);
+  const sn=cs?cs.stage.stage:'—';
+  const fd=pd(ac.stages[0].date),ld=pd(ac.stages[ac.stages.length-1].date);
+  const span=Math.max(1,dd(fd,ld));
+  const el=Math.max(0,Math.min(span,dd(fd,TODAY)));
+  const pct=Math.round(el/span*100);
+  const corteSt=ac.stages.find(s=>s.stage==='Corte');
+  const corteD=corteSt?pd(corteSt.date):null;
+  const diasC=corteD?dd(TODAY,corteD):null;
+  const vars=ac.varieties.filter(v=>v.name);
+  const tp=vars.reduce((a,v)=>a+(parseInt(v.qty)||0),0);
+  const isPast=ld<TODAY,isFut=fd>TODAY;
+  let sb='';
+  if(isPast)sb=`<span class="badge" style="background:#1D5C2A33;color:#7FD896">Completado</span>`;
+  else if(isFut)sb=`<span class="badge" style="background:#1A4A6E33;color:#7CC0F0">Programado</span>`;
+  else sb=`<span class="badge" style="${badgeStyle(sn)}">${sn}</span>`;
+  let di='';
+  if(!isPast&&!isFut&&cs&&cs.next){const d=dd(TODAY,pd(cs.next.date));di=`<span>${d>0?d+'d para siguiente':' Cambio hoy'}</span>`;}
+  else if(isFut&&fd){di=`<span>Inicia en ${dd(TODAY,fd)}d</span>`;}
+  return`<div class="card" style="cursor:pointer" onclick="selectSalaAndShow('${sp.name}')">
+    <div class="card-header"><span class="card-title">${sp.name} <span style="font-size:11px;color:var(--color-text-secondary);font-weight:400">${ac.name}</span></span>${sb}</div>
+    <div class="stage-bar"><div class="stage-fill" style="width:${pct}%;background:${STAGE_COLORS[sn]||'#1D9E75'}"></div></div>
+    <div class="info-row"><span>${pct}% del ciclo</span>${di}${corteD&&!isPast?`<span style="color:#E24B4A">${diasC>0?'Corte en '+diasC+'d':'Corte hoy'}</span>`:''}</div>
+    ${vars.length?`<div class="varieties">${vars.map(v=>`<span class="var-tag" style="border:1px solid ${varietyColor(v.name)}66;color:${varietyColor(v.name)}">${v.name}${v.qty?' ('+v.qty+')':''}</span>`).join('')}${tp>0?`<span class="var-tag" style="font-weight:500">Total: ${tp}</span>`:''}</div>`:''}
+  </div>`;
+}
+
+function selectSalaAndShow(name){
+  selectedSala=name;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-detalle').classList.add('active');
+  document.querySelectorAll('.tab')[3].classList.add('active');
+  renderDetalleView();
+}
+
+function updateClock(){
+  const now=new Date();
+  const dateEl=document.getElementById('clock-date');
+  const timeEl=document.getElementById('clock-time');
+  if(dateEl){
+    dateEl.textContent=now.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  }
+  if(timeEl){
+    timeEl.textContent=now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  }
+}
+
+function renderTasks(){
+  const card=document.getElementById('tasks-card');
+  if(!card)return;
+  let h='';
+  if(!tasks.length){
+    h+=`<div style="font-size:12px;color:var(--color-text-secondary);text-align:center;padding:8px 0">Sin tareas para hoy.</div>`;
+  } else {
+    tasks.forEach(t=>{
+      h+=`<div class="task-item">
+        <div class="task-check${t.done?' done':''}" onclick="toggleTask(${t.id})">${t.done?'<i class="ti ti-check" aria-hidden="true" style="font-size:11px;color:#fff"></i>':''}</div>
+        <div class="task-text${t.done?' done':''}">${t.text}</div>
+        <div class="task-del" onclick="deleteTask(${t.id})"><i class="ti ti-x" aria-hidden="true" style="font-size:13px"></i></div>
+      </div>`;
+    });
+  }
+  h+=`<div class="task-input-row">
+    <input type="text" class="task-input" id="new-task-input" placeholder="Agregar tarea..." onkeydown="if(event.key==='Enter')addTask()">
+    <button class="task-add-btn" onclick="addTask()"><i class="ti ti-plus" aria-hidden="true" style="font-size:13px"></i></button>
+  </div>`;
+  card.innerHTML=h;
+}
+
+let taskIdCounter=3;
+function addTask(){
+  const input=document.getElementById('new-task-input');
+  const text=input.value.trim();
+  if(!text)return;
+  tasks.push({id:taskIdCounter++,text:text,done:false});
+  input.value='';
+  renderTasks();
+}
+
+function toggleTask(id){
+  const t=tasks.find(x=>x.id===id);
+  if(t)t.done=!t.done;
+  renderTasks();
+}
+
+function deleteTask(id){
+  tasks=tasks.filter(x=>x.id!==id);
+  renderTasks();
+}
+
+function renderAlertas(){
+  const evs=[];
+  DATA.forEach(sp=>{sp.cycles.forEach(c=>{if(!c.stages)return;c.stages.forEach(s=>{const d=pd(s.date);if(!d)return;const df=dd(TODAY,d);if(df>=-3&&df<=45)evs.push({space:sp.name,cycle:c.name,stage:s.stage,date:d,diff:df,past:df<0});});});});
+  evs.sort((a,b)=>a.diff-b.diff);
+  const urg=evs.filter(e=>e.diff>=0&&e.diff<=7);
+  const prox=evs.filter(e=>e.diff>7&&e.diff<=30);
+  const fut=evs.filter(e=>e.diff>30);
+  const past=evs.filter(e=>e.past);
+  function rg(title,items,dot){
+    if(!items.length)return'';
+    let h=`<div class="section-title">${title}</div><div class="card">`;
+    items.forEach(e=>{const lbl=e.diff===0?'Hoy':e.diff<0?`Hace ${Math.abs(e.diff)}d`:`En ${e.diff}d (${fmt(e.date)})`;h+=`<div class="alert-item"><div class="alert-dot" style="background:${dot}"></div><div class="alert-text"><strong style="font-weight:500">${e.space}</strong> ${e.cycle} — ${e.stage}</div><div class="alert-date">${lbl}</div></div>`;});
+    return h+`</div>`;
+  }
+  let h=rg('Próximos 7 días',urg,'#E24B4A')+rg('8 a 30 días',prox,'#FAC775')+rg('30 a 45 días',fut,'#1D9E75');
+  if(past.length)h+=rg('Recientes (últimos 3 días)',past,'#B4B2A9');
+  if(!evs.length)h=`<div class="card" style="text-align:center;padding:24px;color:var(--color-text-secondary)">Sin eventos próximos en 45 días.</div>`;
+  return h;
+}
+
+function renderGantt(){
+  const all=[];
+  DATA.forEach(sp=>sp.cycles.forEach(c=>{if(c.stages)c.stages.forEach(s=>{const d=pd(s.date);if(d)all.push(d);});}));
+  const minD=new Date(Math.min(...all.map(d=>d.getTime())));
+  const maxD=new Date(Math.max(...all.map(d=>d.getTime())));
+  const span=Math.max(1,dd(minD,maxD));
+  const tp=Math.max(0,Math.min(100,dd(minD,TODAY)/span*100));
+  function pos(d){return Math.max(0,Math.min(100,dd(minD,d)/span*100));}
+
+  const months=[];let cur=new Date(minD.getFullYear(),minD.getMonth(),1);
+  while(cur<=maxD){months.push(new Date(cur));cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);}
+  const monthEnds=[];
+  cur=new Date(minD.getFullYear(),minD.getMonth()+1,1);
+  while(cur<=maxD){monthEnds.push(new Date(cur));cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);}
+
+  let h=`<div class="gantt-wrap"><div class="gantt-header" style="display:flex;align-items:center;gap:8px;margin-bottom:2px;min-width:780px"><div style="width:80px;flex-shrink:0"></div><div style="flex:1;position:relative;height:16px">`;
+  months.forEach(m=>{h+=`<span style="position:absolute;left:${pos(m)}%;font-size:10px;color:var(--color-text-secondary);transform:translateX(-50%)">${m.toLocaleDateString('es-CL',{month:'short',year:'2-digit'})}</span>`;});
+  h+=`</div></div>`;
+
+  DATA.forEach(sp=>{
+    sp.cycles.forEach((c,ci)=>{
+      if(!c.stages||!c.stages.length)return;
+      const dispStages=getDisplayStages(c);
+      h+=`<div class="gantt-row"><div class="gantt-label">${ci===0?sp.name:''}</div><div class="gantt-track">`;
+      monthEnds.forEach(me=>{h+=`<div class="gantt-monthline" style="left:${pos(me)}%"></div>`;});
+      h+=`<div class="gantt-today" style="left:${tp}%"></div>`;
+      for(let i=0;i<dispStages.length-1;i++){
+        const s=dispStages[i],n=dispStages[i+1];
+        const sd=pd(s.date),nd=pd(n.date);
+        if(!sd||!nd)continue;
+        const l=pos(sd),w=pos(nd)-pos(sd);
+        if(w<0.3)continue;
+        const col=STAGE_COLORS[s.stage]||'#888';
+        h+=`<div class="gantt-seg" style="left:${l}%;width:${w}%;background:${col}" title="${s.stage}: ${fmt(sd)}→${fmt(nd)}">${w>6?s.stage.split(' ')[0]:''}</div>`;
+      }
+      h+=`<div style="position:absolute;top:-14px;left:${pos(pd(c.stages[0].date))}%;font-size:10px;color:var(--color-text-secondary);z-index:5">${c.name}</div></div></div>`;
+    });
+    h+=`<div style="height:4px"></div>`;
+  });
+  h+=`</div><div class="legend-row">`;
+  Object.entries(STAGE_COLORS).forEach(([k,v])=>{h+=`<span class="legend-item"><span class="legend-swatch" style="background:${v}"></span>${k}</span>`;});
+  h+=`<span class="legend-item" style="color:#E24B4A"><span style="width:2px;height:12px;background:#E24B4A;display:inline-block"></span>Hoy</span></div>`;
+  return h;
+}
+
+function renderDetalle(spName){
+  const sp=DATA.find(d=>d.name===spName);
+  if(!sp)return'<p>No encontrado</p>';
+  const ac=getActive(sp);
+  if(!ac||!ac.stages||!ac.stages.length)return`<div class="card" style="text-align:center;padding:24px;color:var(--color-text-secondary)">Sin datos de ciclo activo para ${spName}.</div>`;
+  const cs=getCurStage(ac);
+  const sn=cs?cs.stage.stage:'—';
+  const fd=pd(ac.stages[0].date),ld=pd(ac.stages[ac.stages.length-1].date);
+  const spanD=Math.max(1,dd(fd,ld));
+  const el=Math.max(0,Math.min(spanD,dd(fd,TODAY)));
+  const pct=Math.round(el/spanD*100);
+  const corteSt=ac.stages.find(s=>s.stage==='Corte');
+  const corteD=corteSt?pd(corteSt.date):null;
+  const diasC=corteD?dd(TODAY,corteD):null;
+  const vars=ac.varieties.filter(v=>v.name);
+  const tp=vars.reduce((a,v)=>a+(parseInt(v.qty)||0),0);
+  const isPast=ld<TODAY,isFut=fd>TODAY;
+  const dispStages=getDisplayStages(ac);
+
+  let h=`<div class="grid4">
+    <div class="metric"><div class="lbl">Ciclo activo</div><div class="val" style="font-size:16px">${ac.name}</div></div>
+    <div class="metric"><div class="lbl">Etapa actual</div><div class="val" style="font-size:15px;color:${STAGE_COLORS[sn]||'#1D9E75'}">${sn}</div></div>
+    <div class="metric"><div class="lbl">Progreso ciclo</div><div class="val">${pct}%</div></div>
+    <div class="metric"><div class="lbl">${corteD&&!isPast?'Días para corte':'Corte'}</div><div class="val" style="color:${corteD&&!isPast&&diasC<=14?'#E24B4A':'var(--color-text-primary)'}">${corteD?(isPast?fmt(corteD):(diasC===0?'Hoy':diasC+'d')):' — '}</div></div>
+  </div>`;
+
+  h+=`<div class="stage-bar" style="height:10px;margin-bottom:16px"><div class="stage-fill" style="width:${pct}%;background:${STAGE_COLORS[sn]||'#1D9E75'}"></div></div>`;
+
+  h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">`;
+
+  h+=`<div>
+    <div class="section-title">Línea de tiempo — ${ac.name}</div>
+    <div class="card" style="padding:12px 14px">
+      <div class="timeline-wrap">
+        <div class="tl-line"></div>`;
+  dispStages.forEach((s,i)=>{
+    const sd=pd(s.date);
+    const nextS=dispStages[i+1];
+    const nd=nextS?pd(nextS.date):null;
+    const isActive=cs&&cs.stage.stage===s.stage&&cs.idx===i;
+    const isPastStage=sd&&sd<TODAY&&!(isActive);
+    const dotColor=isActive?(STAGE_COLORS[s.stage]||'#1D9E75'):isPastStage?'#3A6B47':'var(--color-border-secondary)';
+    const daysLeft=nd?dd(TODAY,nd):null;
+    let pill='';
+    if(isActive&&daysLeft!==null&&daysLeft>0)pill=`<span class="tl-days" style="background:${STAGE_COLORS[s.stage]}22;color:${STAGE_COLORS[s.stage]}">${daysLeft}d restantes</span>`;
+    else if(isActive&&daysLeft===0)pill=`<span class="tl-days" style="background:#E24B4A22;color:#E24B4A">Cambio hoy</span>`;
+    else if(isActive&&!nextS)pill=`<span class="tl-days" style="background:#1D5C2A33;color:#7FD896">Completado</span>`;
+    h+=`<div class="tl-item">
+      <div class="tl-dot" style="background:${dotColor};${isActive?'box-shadow:0 0 0 3px '+STAGE_COLORS[s.stage]+'44':''}"></div>
+      <div class="tl-content">
+        <div class="tl-stage" style="${isActive?'font-weight:600':''}${isPastStage?';color:var(--color-text-secondary)':''}">${s.stage}</div>
+        <div class="tl-date">${fmtFull(sd)}${nd?' → '+fmtFull(nd):''}</div>
+        ${pill}
+      </div>
+    </div>`;
+  });
+  h+=`</div></div></div>`;
+
+  h+=`<div>`;
+
+  if(vars.length){
+    h+=`<div class="section-title">Variedades</div><div class="card" style="padding:12px 14px">`;
+    vars.forEach(v=>{
+      const pctV=tp>0?Math.round((parseInt(v.qty)||0)/tp*100):0;
+      const vc=varietyColor(v.name);
+      h+=`<div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <span style="color:${vc};font-weight:500">${v.name}</span>
+          <span style="color:var(--color-text-secondary)">${v.qty||'—'} plantas${tp>0?' ('+pctV+'%)':''}</span>
+        </div>
+        <div class="stage-bar" style="height:5px"><div class="stage-fill" style="width:${pctV}%;background:${vc}"></div></div>
+      </div>`;
+    });
+    h+=`<div style="font-size:12px;color:var(--color-text-secondary);border-top:0.5px solid var(--color-border-tertiary);padding-top:8px;margin-top:4px">Total: <strong style="font-weight:500;color:var(--color-text-primary)">${tp} plantas</strong></div>`;
+    h+=`</div>`;
+  }
+
+  {
+    const obsText=(ac.obs&&ac.obs.trim())?ac.obs.replace('Observaciones:','').trim():'';
+    h+=`<div class="section-title">Observaciones</div>
+    <div class="card" style="padding:12px 14px">
+      <div class="obs-box">${obsText||'Sin observaciones registradas para este ciclo.'}</div>
+    </div>`;
+  }
+
+  h+=`<div class="section-title">pH / EC / PPFD / Temperatura / Humedad</div>
+  <div class="card" style="padding:12px 14px">
+    <table class="ph-table">
+      <thead><tr><th>Fecha</th><th>pH</th><th>EC (ppm)</th><th>PPFD (µmol/m²/s)</th><th>Temp °C</th><th>Hum %</th></tr></thead>
+      <tbody>
+        <tr><td colspan="6" style="text-align:center;color:var(--color-text-secondary);padding:16px;font-size:12px">Completa el historial en el Excel para ver los datos aquí.</td></tr>
+      </tbody>
+    </table>
+  </div>`;
+
+  h+=`</div></div>`;
+
+  h+=`<div class="section-title" style="margin-top:4px">Todos los ciclos</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">`;
+  sp.cycles.forEach(c=>{
+    if(!c.stages||!c.stages.length)return;
+    const cf=pd(c.stages[0].date),cl=pd(c.stages[c.stages.length-1].date);
+    const isCur=ac.name===c.name;
+    const corte=c.stages.find(s=>s.stage==='Corte');
+    h+=`<div class="card" style="${isCur?'border-color:#1D9E75;border-width:1.5px':''}padding:10px 12px">
+      <div style="font-size:12px;font-weight:500;color:${isCur?'#1D9E75':'var(--color-text-primary)'};">${c.name}${isCur?' ← activo':''}</div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px">Inicio: ${fmtFull(cf)}</div>
+      <div style="font-size:11px;color:var(--color-text-secondary)">Corte: ${corte?fmtFull(pd(corte.date)):'—'}</div>
+      ${c.varieties.length?`<div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px">${c.varieties.filter(v=>v.name).map(v=>v.name).join(', ')}</div>`:''}
+    </div>`;
+  });
+  h+=`</div>`;
+  return h;
+}
+
+function renderDetalleView(){
+  const container=document.getElementById('view-detalle');
+  let sel=`<div class="sala-selector">`;
+  DATA.forEach(sp=>{sel+=`<button class="sala-btn${sp.name===selectedSala?' active':''}" onclick="selectSala('${sp.name}')">${sp.name}</button>`;});
+  sel+=`</div>`;
+  container.innerHTML=sel+`<div id="detalle-content">`+renderDetalle(selectedSala)+`</div>`;
+}
+
+function selectSala(name){
+  selectedSala=name;
+  document.querySelectorAll('.sala-btn').forEach(b=>{b.classList.toggle('active',b.textContent===name);});
+  document.getElementById('detalle-content').innerHTML=renderDetalle(name);
+}
+
+function renderRagnar(){
+  const totalEsquejes=RAGNAR.esquejes.reduce((a,e)=>a+(parseInt(e.cantidad)||0),0);
+  const totalMacetas=RAGNAR.macetas.reduce((a,e)=>a+(parseInt(e.cantidad)||0),0);
+  const totalMadres=RAGNAR.madres.reduce((a,e)=>a+(parseInt(e.cantidad)||0),0);
+
+  let h=`<div class="grid4">
+    <div class="metric"><div class="lbl">Total esquejes</div><div class="val">${totalEsquejes}</div></div>
+    <div class="metric"><div class="lbl">Macetas en vegetación</div><div class="val">${totalMacetas}</div></div>
+    <div class="metric"><div class="lbl">Plantas madre</div><div class="val">${totalMadres}</div></div>
+  </div>`;
+
+  h+=`<div class="ragnar-title"><i class="ti ti-cut" aria-hidden="true"></i>Esquejes</div>
+  <div class="card" style="padding:12px 14px">
+    <table class="ph-table"><thead><tr><th>Variedad</th><th>Cantidad</th><th>Sala destino</th></tr></thead><tbody>`;
+  RAGNAR.esquejes.forEach(e=>{
+    h+=`<tr><td><span class="variety-name" style="color:${varietyColor(e.variedad)}">${e.variedad}</span></td><td>${e.cantidad!=null?e.cantidad:'—'}</td><td>${e.sala_destino||'—'}</td></tr>`;
+  });
+  h+=`</tbody></table></div>`;
+
+  h+=`<div class="ragnar-title"><i class="ti ti-leaf" aria-hidden="true"></i>Macetas en vegetación</div>
+  <div class="card" style="padding:12px 14px">
+    <table class="ph-table"><thead><tr><th>Variedad</th><th>Fecha ingreso</th><th>Cantidad</th><th>Sala destino</th></tr></thead><tbody>`;
+  if(!RAGNAR.macetas.length){
+    h+=`<tr><td colspan="4" style="text-align:center;color:var(--color-text-secondary);padding:12px;font-size:12px">Sin macetas en vegetación registradas.</td></tr>`;
+  } else {
+    RAGNAR.macetas.forEach(m=>{
+      h+=`<tr><td><span class="variety-name" style="color:${varietyColor(m.variedad)}">${m.variedad}</span></td><td>${m.fecha?fmtFull(pd(m.fecha)):'—'}</td><td>${m.cantidad!=null?m.cantidad:'—'}</td><td>${m.sala_destino||'—'}</td></tr>`;
+    });
+  }
+  h+=`</tbody></table></div>`;
+
+  h+=`<div class="ragnar-title"><i class="ti ti-flower" aria-hidden="true"></i>Plantas madres</div>
+  <div class="card" style="padding:12px 14px">
+    <table class="ph-table"><thead><tr><th>Variedad</th><th>Última toma de clones</th><th>Cantidad</th><th>Observaciones</th></tr></thead><tbody>`;
+  RAGNAR.madres.forEach(m=>{
+    h+=`<tr><td><span class="variety-name" style="color:${varietyColor(m.variedad)}">${m.variedad}</span></td><td>${m.fecha_clones?fmtFull(pd(m.fecha_clones)):'—'}</td><td>${m.cantidad!=null?m.cantidad:'—'}</td><td>${m.obs||'—'}</td></tr>`;
+  });
+  h+=`</tbody></table></div>`;
+
+  h+=`<div class="section-title">pH / EC / PPFD / Temperatura / Humedad</div>
+  <div class="card" style="padding:12px 14px">
+    <table class="ph-table"><thead><tr><th>Fecha</th><th>pH</th><th>EC (ppm)</th><th>PPFD (µmol/m²/s)</th><th>Notas</th></tr></thead><tbody>`;
+  if(!RAGNAR.historial.length){
+    h+=`<tr><td colspan="5" style="text-align:center;color:var(--color-text-secondary);padding:16px;font-size:12px">Completa el historial en el Excel para ver los datos aquí.</td></tr>`;
+  } else {
+    RAGNAR.historial.forEach(r=>{
+      h+=`<tr><td>${r.fecha?fmtFull(pd(r.fecha)):'—'}</td><td>${r.ph!=null?r.ph:'—'}</td><td>${r.ec!=null?r.ec:'—'}</td><td>${r.ppfd!=null?r.ppfd:'—'}</td><td>${r.notas||'—'}</td></tr>`;
+    });
+  }
+  h+=`</tbody></table></div>`;
+
+  return h;
+}
+
+function getProyMonths(){
+  const months=[...new Set(PROY.map(e=>{const d=pd(e.fecha);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}))];
+  return months.sort();
+}
+
+function renderProyeccion(){
+  if(!PROY.length){
+    return `<div class="card" style="text-align:center;padding:24px;color:var(--color-text-secondary)">No hay eventos de "Disponible" con variedades cargadas todavía.</div>`;
+  }
+
+  const monthKeys=getProyMonths();
+  if(!selectedMonth)selectedMonth=monthKeys[0];
+
+  let h=`<div class="section-title">Variedades por mes</div>
+  <div class="month-selector">`;
+  monthKeys.forEach(mk=>{
+    const[y,m]=mk.split('-');
+    const label=new Date(parseInt(y),parseInt(m)-1,1).toLocaleDateString('es-CL',{month:'short',year:'2-digit'});
+    h+=`<button class="month-btn${mk===selectedMonth?' active':''}" onclick="selectProyMonth('${mk}')">${label}</button>`;
+  });
+  h+=`</div>
+  <div style="position:relative;height:240px;margin-bottom:8px">
+    <canvas id="varietyPieChart" role="img" aria-label="Gráfico de pizza mostrando porcentaje de cada variedad disponible en el mes seleccionado"></canvas>
+  </div>
+  <div id="varietyLegend" class="legend-row"></div>
+
+  <div class="section-title" style="margin-top:16px">Calendario de disponibilidad</div>`;
+
+  PROY.forEach(e=>{
+    const d=pd(e.fecha);
+    const coloredVars=e.variedades.split(',').map(p=>{
+      const t=p.trim();
+      const m=t.match(/^(.*)\s(\(\d+\))$/);
+      if(m)return`<span style="color:${varietyColor(m[1].trim())};font-weight:500">${m[1].trim()}</span> ${m[2]}`;
+      return`<span style="color:${varietyColor(t)};font-weight:500">${t}</span>`;
+    }).join(', ');
+    h+=`<div class="event-item">
+      <div class="event-date">${fmtFull(d)}</div>
+      <div class="event-content">
+        <div class="event-sala">${e.sala}</div>
+        <div class="event-vars">${coloredVars}</div>
+      </div>
+    </div>`;
+  });
+
+  setTimeout(()=>{
+    renderVarietyPie();
+  },50);
+
+  return h;
+}
+
+function selectProyMonth(mk){
+  selectedMonth=mk;
+  document.querySelectorAll('.month-btn').forEach(b=>{
+    const label=(()=>{const[y,m]=mk.split('-');return new Date(parseInt(y),parseInt(m)-1,1).toLocaleDateString('es-CL',{month:'short',year:'2-digit'});})();
+    b.classList.toggle('active',b.textContent===label);
+  });
+  renderVarietyPie();
+}
+
+let pieChartInstance=null;
+function renderVarietyPie(){
+  const ctx=document.getElementById('varietyPieChart');
+  if(!ctx)return;
+
+  const events=PROY.filter(e=>{
+    const d=pd(e.fecha);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    return key===selectedMonth;
+  });
+
+  const varietyTotals={};
+  events.forEach(e=>{
+    const parts=e.variedades.split(',').map(p=>p.trim());
+    parts.forEach(p=>{
+      const m=p.match(/^(.*)\s\((\d+)\)$/);
+      if(m){
+        const name=m[1].trim();
+        const qty=parseInt(m[2])||0;
+        varietyTotals[name]=(varietyTotals[name]||0)+qty;
+      }
+    });
+  });
+
+  const labels=Object.keys(varietyTotals);
+  const values=Object.values(varietyTotals);
+  const total=values.reduce((a,b)=>a+b,0);
+  const colors=labels.map(l=>varietyColor(l));
+
+  if(pieChartInstance)pieChartInstance.destroy();
+  pieChartInstance=new Chart(ctx,{
+    type:'pie',
+    data:{labels:labels,datasets:[{data:values,backgroundColor:colors,borderWidth:2,borderColor:'#000'}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}}
+    }
+  });
+
+  const legendEl=document.getElementById('varietyLegend');
+  if(legendEl){
+    legendEl.innerHTML=labels.map((l,i)=>{
+      const pct=total>0?Math.round(values[i]/total*100):0;
+      return `<span class="legend-item"><span class="legend-swatch" style="background:${colors[i]}"></span><span style="color:${colors[i]};font-weight:500">${l}</span>: ${values[i]} (${pct}%)</span>`;
+    }).join('');
+  }
+}
+
+function renderPesos(){
+  const byDate={};
+  PESOS.forEach(p=>{
+    if(p.peso_kg!=null&&p.fecha){
+      byDate[p.fecha]=(byDate[p.fecha]||0)+(p.peso_kg||0);
+    }
+  });
+
+  const allDates=[...new Set(PESOS.filter(p=>p.fecha).map(p=>p.fecha))].sort();
+  const monthSet=new Set();
+  allDates.forEach(d=>{const dt=pd(d);monthSet.add(`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`);});
+  const monthKeys=[...monthSet].sort();
+
+  const byMonth={};
+  monthKeys.forEach(k=>byMonth[k]=0);
+  Object.entries(byDate).forEach(([dateStr,kg])=>{
+    const dt=pd(dateStr);
+    const key=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+    byMonth[key]=(byMonth[key]||0)+kg;
+  });
+
+  const labels=monthKeys.map(k=>{const[y,m]=k.split('-');return new Date(parseInt(y),parseInt(m)-1,1).toLocaleDateString('es-CL',{month:'short',year:'2-digit'});});
+  const values=monthKeys.map(k=>Math.round((byMonth[k]||0)*100)/100);
+
+  let h=`<div class="section-title">Cosechas por mes (kg secos)</div>
+  <div style="position:relative;height:220px;margin-bottom:8px">
+    <canvas id="pesosChart" role="img" aria-label="Gráfico de barras de kilogramos cosechados por mes">Kg por mes: ${monthKeys.map((k,i)=>labels[i]+': '+values[i]+'kg').join(', ')}</canvas>
+  </div>
+  <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:16px">Los meses sin cosechas registradas aparecen en 0 — se irán completando a medida que cargues pesos en el Excel.</div>`;
+
+  setTimeout(()=>{
+    const ctx=document.getElementById('pesosChart');
+    if(!ctx)return;
+    new Chart(ctx,{
+      type:'bar',
+      data:{labels:labels,datasets:[{label:'kg secos',data:values,backgroundColor:'#1D9E75',borderRadius:4}]},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          y:{beginAtZero:true,title:{display:true,text:'kg',color:'#9A978E'},ticks:{color:'#9A978E'},grid:{color:'#2A2A2A'}},
+          x:{ticks:{color:'#9A978E'},grid:{color:'#2A2A2A'}}
+        }
+      }
+    });
+  },50);
+
+  h+=`<div class="section-title">Por sala / carpa</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:10px">`;
+
+  const bySala={};
+  PESOS.forEach(p=>{
+    if(!bySala[p.sala])bySala[p.sala]=[];
+    bySala[p.sala].push(p);
+  });
+
+  Object.entries(bySala).forEach(([sala,rows])=>{
+    const totalKg=rows.reduce((a,r)=>a+(r.peso_kg||0),0);
+    const cycles=[...new Set(rows.map(r=>r.ciclo).filter(Boolean))];
+    h+=`<div class="card" style="cursor:pointer" onclick="selectPesoSalaAndShow('${sala}')">
+      <div class="card-header">
+        <span class="card-title">${sala}</span>
+        <span class="badge" style="background:var(--color-background-secondary);color:var(--color-text-secondary)">${cycles.length} ciclo${cycles.length!==1?'s':''}</span>
+      </div>
+      <div class="info-row"><span>Total cosechado</span><span style="font-weight:500;color:var(--color-text-primary)">${totalKg>0?Math.round(totalKg*100)/100+' kg':'Sin datos aún'}</span></div>
+    </div>`;
+  });
+  h+=`</div>`;
+
+  return h;
+}
+
+function selectPesoSalaAndShow(sala){
+  selectedPesoSala=sala;
+  document.getElementById('view-pesos').innerHTML=renderPesoDetalle(sala);
+}
+
+function renderPesoDetalle(sala){
+  const rows=PESOS.filter(p=>p.sala===sala);
+  let h=`<button class="sala-btn" style="margin-bottom:14px" onclick="document.getElementById('view-pesos').innerHTML=renderPesos()"><i class="ti ti-arrow-left" aria-hidden="true" style="font-size:12px;margin-right:4px"></i>Volver a Pesos</button>
+  <div class="section-title">${sala} — historial de cosechas</div>`;
+
+  const cycles=[];
+  let curCycle=null;
+  rows.forEach(r=>{
+    if(r.ciclo){curCycle={name:r.ciclo,fecha:r.fecha,rows:[]};cycles.push(curCycle);}
+    if(curCycle)curCycle.rows.push(r);
+  });
+
+  cycles.forEach(c=>{
+    const totalKg=c.rows.reduce((a,r)=>a+(r.peso_kg||0),0);
+    const fechaStr=c.fecha?fmtFull(pd(c.fecha)):'—';
+    h+=`<div class="card" style="padding:12px 14px">
+      <div class="card-header">
+        <span class="card-title">${c.name}</span>
+        <span style="font-size:12px;color:var(--color-text-secondary)">${fechaStr}</span>
+      </div>`;
+    if(c.rows[0].variedad==='(sin variedad)'){
+      h+=`<div style="font-size:12px;color:var(--color-text-secondary)">Ciclo aún sin variedades cargadas.</div>`;
+    } else {
+      h+=`<table class="ph-table"><thead><tr><th>Variedad</th><th>%</th><th>Peso (kg)</th></tr></thead><tbody>`;
+      c.rows.forEach(r=>{
+        const pctStr=r.pct!=null?Math.round(r.pct*1000)/10+'%':'—';
+        const kgStr=r.peso_kg!=null?Math.round(r.peso_kg*100)/100+' kg':'—';
+        h+=`<tr><td>${r.variedad}</td><td>${pctStr}</td><td>${kgStr}</td></tr>`;
+      });
+      h+=`</tbody></table>`;
+      h+=`<div style="font-size:12px;color:var(--color-text-secondary);border-top:0.5px solid var(--color-border-tertiary);padding-top:8px;margin-top:8px">Total ciclo: <strong style="font-weight:500;color:var(--color-text-primary)">${totalKg>0?Math.round(totalKg*100)/100+' kg':'Pendiente de registrar'}</strong></div>`;
+    }
+    h+=`</div>`;
+  });
+
+  return h;
+}
+
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  el.classList.add('active');
+  if(name==='detalle')renderDetalleView();
+  if(name==='ragnar')document.getElementById('view-ragnar').innerHTML=renderRagnar();
+  if(name==='proyeccion')document.getElementById('view-proyeccion').innerHTML=renderProyeccion();
+  if(name==='pesos'){selectedPesoSala=null;document.getElementById('view-pesos').innerHTML=renderPesos();}
+}
+
+function excelDateToISO(d){
+  if(d instanceof Date){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${dd}`;}
+  if(typeof d==='number'){const b=new Date(1899,11,30);b.setDate(b.getDate()+d);const y=b.getFullYear(),m=String(b.getMonth()+1).padStart(2,'0'),dd=String(b.getDate()).padStart(2,'0');return `${y}-${m}-${dd}`;}
+  return null;
+}
+
+function parseWorkbookArrayBuffer(arrayBuffer){
+  const wb=XLSX.read(arrayBuffer,{type:'array',cellDates:true});
+  const SS=new Set(["Esquejes","Trasplante a Vaso","Trasplante Maceta","Ingreso a Sala","Ingreso a Carpa","Floración","Corte","Secado","Procesado","Disponible"]);
+  const parsed=[];
+  wb.SheetNames.filter(n=>n.startsWith('SALA')||n.startsWith('CARPA')).forEach(sn=>{
+    const ws=wb.Sheets[sn];
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+    const cycles=[];let cur=null;let inV=false;let obsN=false;
+    rows.forEach(row=>{
+      const v0=row[0]?String(row[0]).trim():'';
+      if(v0.startsWith('CICLO')){if(cur)cycles.push(cur);cur={name:v0,stages:[],varieties:[],obs:''};inV=false;obsN=false;return;}
+      if(!cur)return;
+      if(v0==='VARIEDADES'){inV=true;return;}if(v0==='TOTAL'){inV=false;return;}
+      if(v0==='Observaciones:'){obsN=true;return;}
+      if(v0.startsWith('Observaciones:')){cur.obs=v0.slice('Observaciones:'.length).trim();obsN=false;return;}
+      if(obsN&&v0&&v0!=='Etapa'){cur.obs=v0;obsN=false;return;}
+      if(inV&&v0&&v0!=='Cant.'){cur.varieties.push({name:v0,qty:row[1]||''});return;}
+      if(SS.has(v0)&&row[2]){
+        let d=row[2];
+        if(d instanceof Date){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');d=`${y}-${m}-${dd}`;}
+        else if(typeof d==='number'){const b=new Date(1899,11,30);b.setDate(b.getDate()+d);const y=b.getFullYear(),m=String(b.getMonth()+1).padStart(2,'0'),dd=String(b.getDate()).padStart(2,'0');d=`${y}-${m}-${dd}`;}
+        cur.stages.push({stage:v0,days:row[1]||0,date:d});
+      }
+    });
+    if(cur)cycles.push(cur);
+    parsed.push({name:sn,cycles});
+  });
+
+  let ragnar=null;
+  const ragnarSheetName=wb.SheetNames.find(n=>n.trim().toUpperCase()==='RAGNAR');
+  if(ragnarSheetName){
+    const ws=wb.Sheets[ragnarSheetName];
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+    const get=(r,c)=>{const row=aoa[r-1];return row?row[c-1]:null;};
+    const esquejes=[],macetas=[],madres=[],historial=[];
+    for(let r=5;r<=aoa.length;r++){
+      const v=get(r,1);
+      if(v===null||v===undefined||String(v).trim()==='')continue;
+      const v0=String(v).trim();
+      if(v0==='PLANTAS MADRES'||v0==='HISTORIAL pH / EC / TEMP / HUM')break;
+      esquejes.push({variedad:v0,cantidad:get(r,3)!=null?parseInt(get(r,3))||0:null,sala_destino:get(r,4)||null});
+    }
+    for(let r=5;r<=aoa.length;r++){
+      const v=get(r,6);
+      if(v===null||v===undefined||String(v).trim()==='')continue;
+      const v0=String(v).trim();
+      if(v0==='HISTORIAL pH / EC / TEMP / HUM'||v0==='Fecha')break;
+      macetas.push({variedad:v0,fecha:excelDateToISO(get(r,7)),cantidad:get(r,8)!=null?parseInt(get(r,8))||0:null,sala_destino:get(r,9)||null});
+    }
+    let madresStart=null;
+    for(let r=1;r<=aoa.length;r++){if(get(r,1)==='PLANTAS MADRES'){madresStart=r+2;break;}}
+    if(madresStart){
+      for(let r=madresStart;r<=aoa.length;r++){
+        const v=get(r,1);
+        if(v===null||v===undefined||String(v).trim()==='')break;
+        madres.push({variedad:String(v).trim(),fecha_clones:excelDateToISO(get(r,2)),cantidad:get(r,3)!=null?parseInt(get(r,3))||0:null,obs:get(r,4)||null});
+      }
+    }
+    let histStart=null;
+    for(let r=1;r<=aoa.length;r++){if(get(r,6)==='Fecha'){histStart=r+1;break;}}
+    if(histStart){
+      for(let r=histStart;r<=aoa.length;r++){
+        const f=get(r,6);
+        if(f===null||f===undefined||String(f).trim()==='')continue;
+        historial.push({fecha:excelDateToISO(f),ph:get(r,7),ec:get(r,8),ppfd:get(r,9),notas:get(r,10)||null});
+      }
+    }
+    ragnar={esquejes,macetas,madres,historial};
+  }
+
+  let proy=null;
+  const proySheetName=wb.SheetNames.find(n=>n.trim().toUpperCase().startsWith('PROYECCI'));
+  if(proySheetName){
+    const ws=wb.Sheets[proySheetName];
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+    let headerRow=null;
+    for(let r=1;r<=aoa.length;r++){if(aoa[r-1]&&aoa[r-1][0]==='Sala / Carpa'){headerRow=r;break;}}
+    proy=[];
+    if(headerRow){
+      for(let r=headerRow+1;r<=aoa.length;r++){
+        const row=aoa[r-1];
+        if(!row||!row[0]||String(row[0]).trim()==='')continue;
+        const fecha=excelDateToISO(row[1]);
+        proy.push({sala:String(row[0]).trim(),fecha:fecha,mes:row[2]||'',variedades:row[3]||''});
+      }
+    }
+  }
+
+  return {data:parsed,ragnar,proy};
+}
+
+function applyParsedData(result){
+  const parsed=result.data;
+  if(!parsed||!parsed.length)return false;
+  DATA=parsed;selectedSala=DATA[0].name;VARIETY_COLOR_MAP=null;
+  if(result.ragnar)RAGNAR=result.ragnar;
+  if(result.proy&&result.proy.length)PROY=result.proy;
+  selectedMonth=null;
+  document.getElementById('view-estado').innerHTML=renderEstado();
+  updateClock();
+  renderTasks();
+  document.getElementById('view-alertas').innerHTML=renderAlertas();
+  document.getElementById('view-gantt').innerHTML=renderGantt();
+  const activeView=document.querySelector('.view.active').id.replace('view-','');
+  if(activeView==='detalle')renderDetalleView();
+  if(activeView==='ragnar')document.getElementById('view-ragnar').innerHTML=renderRagnar();
+  if(activeView==='proyeccion')document.getElementById('view-proyeccion').innerHTML=renderProyeccion();
+  if(activeView==='pesos'){selectedPesoSala=null;document.getElementById('view-pesos').innerHTML=renderPesos();}
+  return true;
+}
+
+const DROPBOX_URL="https://www.dropbox.com/scl/fi/j0jqr3pu5q5k0w8a7fzdn/Planificacion_GrowMore.xlsx.xlsx?rlkey=h40ahn48f1ng46silm9t5zyvn&st=45ksne5m&dl=1";
+
+function loadFromDropbox(showAlertOnError){
+  const statusEl=document.getElementById('dropbox-status');
+  if(statusEl)statusEl.textContent='Actualizando...';
+  fetch(DROPBOX_URL)
+    .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.arrayBuffer();})
+    .then(buf=>{
+      const parsed=parseWorkbookArrayBuffer(buf);
+      if(applyParsedData(parsed)){
+        if(statusEl)statusEl.textContent='Actualizado '+new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+      }
+    })
+    .catch(err=>{
+      if(statusEl)statusEl.textContent='Sin conexión a Dropbox (usando datos locales)';
+      if(showAlertOnError)alert('No se pudo cargar el Excel desde Dropbox: '+err.message);
+    });
+}
+
+document.getElementById('view-estado').innerHTML=renderEstado();
+updateClock();
+setInterval(updateClock,1000);
+renderTasks();
+document.getElementById('view-alertas').innerHTML=renderAlertas();
+document.getElementById('view-gantt').innerHTML=renderGantt();
+loadFromDropbox(false);
+
+document.getElementById('xlsxInput').addEventListener('change',function(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const parsed=parseWorkbookArrayBuffer(ev.target.result);
+      if(!applyParsedData(parsed))alert('No se encontraron hojas SALA/CARPA en el archivo.');
+    }catch(err){alert('Error al leer el archivo.');}
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+</script>
+</body>
+</html>
